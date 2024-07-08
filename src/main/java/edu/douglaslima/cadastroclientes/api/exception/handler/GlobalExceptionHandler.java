@@ -9,9 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import edu.douglaslima.cadastroclientes.api.exception.CepNaoEncontradoException;
-import edu.douglaslima.cadastroclientes.api.exception.ClienteNaoEncontradoException;
-import edu.douglaslima.cadastroclientes.api.exception.ResponseError;
+import edu.douglaslima.cadastroclientes.api.exception.*;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
@@ -33,4 +31,5 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		ResponseError responseBody = new ResponseError(HttpStatus.NOT_FOUND.value(), exception.getMessage());
 		return super.handleExceptionInternal(exception, responseBody, this.header(), HttpStatus.NOT_FOUND, request);
 	}
+	
 }

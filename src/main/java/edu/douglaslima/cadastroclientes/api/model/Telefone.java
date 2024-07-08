@@ -61,5 +61,13 @@ public class Telefone {
 	public void setSufixo(String sufixo) {
 		this.sufixo = sufixo;
 	}
+
+	public Cliente getCliente() {
+		return cliente;
+	}
+
+	public void setCliente(Cliente cliente) {
+		this.cliente = cliente;
+	}
 	
 }
