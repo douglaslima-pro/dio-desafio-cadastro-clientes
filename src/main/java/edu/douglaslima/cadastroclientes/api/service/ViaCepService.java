@@ -9,11 +9,11 @@ import org.springframework.web.client.RestClient;
 import edu.douglaslima.cadastroclientes.api.model.Cep;
 
 @Service
-public class CepApiService {
+public class ViaCepService {
 	
 	private final RestClient restClient;
 	
-	public CepApiService() {
+	public ViaCepService() {
 		this.restClient = RestClient.builder()
 				.baseUrl("https://viacep.com.br/ws")
 				.build();
