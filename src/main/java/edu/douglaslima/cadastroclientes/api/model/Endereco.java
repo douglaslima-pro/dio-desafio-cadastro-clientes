@@ -23,6 +23,12 @@ public class Endereco {
 		this.cidade = cidade;
 	}
 	
+	@Override
+	public String toString() {
+		return "Endereco [cep=" + cep + ", estado=" + estado + ", cidade=" + cidade + ", bairro=" + bairro
+				+ ", logradouro=" + logradouro + ", complemento=" + complemento + ", numero=" + numero + "]";
+	}
+
 	public String getCep() {
 		return cep;
 	}

@@ -20,22 +20,22 @@ import edu.douglaslima.cadastroclientes.api.model.Cliente;
 import edu.douglaslima.cadastroclientes.api.service.ClienteViaCepService;
 
 @RestController
-@RequestMapping("/cadastroclientes/api/clientes")
+@RequestMapping("/cadastroclientes/clientes")
 public class ClienteController {
 
 	@Autowired
 	private ClienteViaCepService clienteViaCepService;
 
 	@PostMapping("/cadastro")
-	public ResponseEntity<String> cadastrarCliente(@RequestBody Cliente cliente) {
-		this.clienteViaCepService.cadastrarCliente(cliente);
+	public ResponseEntity<String> inserir(@RequestBody Cliente cliente) {
+		this.clienteViaCepService.inserir(cliente);
 		return ResponseEntity.ok("Cliente cadastrado com sucesso!");
 	}
 
 	@PostMapping("/cadastro/{cep}")
-	public ResponseEntity<String> cadastrarCliente(@RequestBody Cliente cliente, @PathVariable("cep") String cep) {
+	public ResponseEntity<String> inserir(@RequestBody Cliente cliente, @PathVariable("cep") String cep) {
 		try {
-			this.clienteViaCepService.cadastrarCliente(cliente, cep);
+			this.clienteViaCepService.inserir(cliente, cep);
 			return ResponseEntity.ok("Cliente cadastrado com sucesso!");
 		} catch (CepNaoEncontradoException e) {
 			throw new CepNaoEncontradoException(e.getMessage());
@@ -43,9 +43,9 @@ public class ClienteController {
 	}
 
 	@GetMapping("/pesquisa/{cpf}")
-	public ResponseEntity<Cliente> pesquisarClientePeloCpf(@PathVariable("cpf") String cpf) {
+	public ResponseEntity<Cliente> buscarPorCpf(@PathVariable("cpf") String cpf) {
 		try {
-			Cliente cliente = this.clienteViaCepService.pesquisarClientePeloCpf(cpf);
+			Cliente cliente = this.clienteViaCepService.buscarPorCpf(cpf);
 			return ResponseEntity.ok(cliente);
 		} catch(ClienteNaoEncontradoException e) {
 			throw new ClienteNaoEncontradoException(e.getMessage());
@@ -53,15 +53,15 @@ public class ClienteController {
 	}
 	
 	@GetMapping("/pesquisa")
-	public ResponseEntity<List<Cliente>> pesquisarClientes() {
-		List<Cliente> clientes = this.clienteViaCepService.pesquisarClientes();
+	public ResponseEntity<List<Cliente>> buscarTodos() {
+		List<Cliente> clientes = this.clienteViaCepService.buscarTodos();
 		return ResponseEntity.ok(clientes);
 	}
 
 	@DeleteMapping("/exclusao/{id}")
-	public ResponseEntity<String> excluirCliente(@PathVariable("id") Integer id) {
+	public ResponseEntity<String> deletar(@PathVariable("id") Integer id) {
 		try {
-			this.clienteViaCepService.excluirCliente(id);
+			this.clienteViaCepService.deletar(id);
 			return ResponseEntity.ok(String.format("Cliente de ID %d excluído com sucesso!", id));
 		} catch(ClienteNaoEncontradoException e) {
 			throw new ClienteNaoEncontradoException(e.getMessage());

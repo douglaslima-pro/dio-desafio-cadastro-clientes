@@ -1,5 +1,7 @@
 package edu.douglaslima.cadastroclientes.api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -12,6 +14,7 @@ public class Telefone {
 	private Integer id;
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "cliente_id")
+	@JsonIgnoreProperties("telefones")
 	private Cliente cliente; // chave estrangeira da entidade Cliente
 	@Column(columnDefinition = "CHAR(2) NOT NULL")
 	private String ddd;
@@ -30,6 +33,12 @@ public class Telefone {
 		this.sufixo = sufixo;
 	}
 	
+	@Override
+	public String toString() {
+		return "Telefone [id=" + id + ", cliente=" + cliente + ", ddd=" + ddd + ", prefixo=" + prefixo + ", sufixo="
+				+ sufixo + "]";
+	}
+
 	public Integer getId() {
 		return id;
 	}

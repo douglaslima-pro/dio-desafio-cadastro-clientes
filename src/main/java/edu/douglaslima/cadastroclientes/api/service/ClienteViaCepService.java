@@ -6,6 +6,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.google.gson.Gson;
+
 import edu.douglaslima.cadastroclientes.api.exception.CepNaoEncontradoException;
 import edu.douglaslima.cadastroclientes.api.exception.ClienteNaoEncontradoException;
 import edu.douglaslima.cadastroclientes.api.model.Cep;
@@ -35,7 +37,7 @@ public class ClienteViaCepService implements ClienteService {
 	 * @param cliente Objeto que representa uma entidade do tipo {@code Cliente} com todos os seus atributos.
 	 */
 	@Override
-	public void cadastrarCliente(Cliente cliente) {
+	public void inserir(Cliente cliente) {
 		if (!cliente.getTelefones().isEmpty()) {
 			List<Telefone> telefones = cliente.getTelefones();
 			telefones.stream()
@@ -55,8 +57,7 @@ public class ClienteViaCepService implements ClienteService {
 	 * @param cep CEP (Código de Endereçamento Postal)
 	 * @throws CepNaoEncontradoException indica que a API ViaCep não encontrou dados para o CEP informado
 	 */
-	@Override
-	public void cadastrarCliente(Cliente cliente, String cep) throws CepNaoEncontradoException {
+	public void inserir(Cliente cliente, String cep) throws CepNaoEncontradoException {
 		Optional<Cep> cepEncontrado = this.viaCepService.pesquisarCep(cep);
 		if (cepEncontrado.isEmpty()) {
 			throw new CepNaoEncontradoException("Não foram encontrados dados para o CEP informado %s!", cep);
@@ -89,12 +90,12 @@ public class ClienteViaCepService implements ClienteService {
 	 * @return um {@code Optional} contendo os dados do cliente encontrado
 	 */
 	@Override
-	public Cliente pesquisarClientePeloCpf(String cpf) throws ClienteNaoEncontradoException {
-		Optional<Cliente> cliente = this.clienteRepository.findByCpf(cpf);
-		if (cliente.isEmpty()) {
+	public Cliente buscarPorCpf(String cpf) throws ClienteNaoEncontradoException {
+		Optional<Cliente> clienteEncontrado = this.clienteRepository.findByCpf(cpf);
+		if (clienteEncontrado.isEmpty()) {
 			throw new ClienteNaoEncontradoException(String.format("Nenhum cliente foi encontrado com o CPF %s!", cpf));
 		}
-		return cliente.get();
+		return clienteEncontrado.get();
 	}
 	
 	/**
@@ -102,7 +103,7 @@ public class ClienteViaCepService implements ClienteService {
 	 * @return um {@code List} contendo objetos do tipo {@code Cliente}
 	 */
 	@Override
-	public List<Cliente> pesquisarClientes() {
+	public List<Cliente> buscarTodos() {
 		return this.clienteRepository.findAll();
 	}
 	
@@ -111,8 +112,8 @@ public class ClienteViaCepService implements ClienteService {
 	 * @param id id do cliente
 	 */
 	@Override
-	public void excluirCliente(Integer id) throws ClienteNaoEncontradoException {
-		if (!this.existeClientePeloId(id)) {
+	public void deletar(Integer id) throws ClienteNaoEncontradoException {
+		if (!this.existePorId(id)) {
 			throw new ClienteNaoEncontradoException("Nenhum cliente foi encontrado com o ID %d!", id);
 		}
 		this.clienteRepository.deleteById(id);
@@ -124,7 +125,7 @@ public class ClienteViaCepService implements ClienteService {
 	 * @return {@code true} se o cliente existir, caso contrário retorna {@code false}
 	 */
 	@Override
-	public boolean existeClientePeloId(Integer id) {
+	public boolean existePorId(Integer id) {
 		return this.clienteRepository.existsById(id);
 	}
 	

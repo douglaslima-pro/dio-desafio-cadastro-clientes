@@ -15,7 +15,7 @@ public interface ClienteRepository extends JpaRepository<Cliente, Integer> {
 	@Query("SELECT c FROM Cliente c INNER JOIN c.telefones")
 	List<Cliente> findAll();
 
-	@Query("SELECT c FROM Cliente c INNER JOIN c.telefones WHERE c.cpf = (:cpf)")
+	@Query("SELECT c FROM Cliente c JOIN FETCH c.telefones WHERE c.cpf = (:cpf)")
 	Optional<Cliente> findByCpf(@Param("cpf") String cpf);
 
 }

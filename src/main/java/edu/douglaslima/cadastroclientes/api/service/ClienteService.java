@@ -6,16 +6,14 @@ import edu.douglaslima.cadastroclientes.api.model.Cliente;
 
 public interface ClienteService {
 	
-	void cadastrarCliente(Cliente cliente);
+	void inserir(Cliente cliente);
 	
-	void cadastrarCliente(Cliente cliente, String cep);
+	Cliente buscarPorCpf(String cpf);
 	
-	Cliente pesquisarClientePeloCpf(String cpf);
+	List<Cliente> buscarTodos();
 	
-	List<Cliente> pesquisarClientes();
+	void deletar(Integer id);
 	
-	void excluirCliente(Integer id);
-	
-	boolean existeClientePeloId(Integer id);
+	boolean existePorId(Integer id);
 
 }

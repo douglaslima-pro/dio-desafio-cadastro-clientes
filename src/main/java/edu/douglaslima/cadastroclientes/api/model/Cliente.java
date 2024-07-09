@@ -3,6 +3,8 @@ package edu.douglaslima.cadastroclientes.api.model;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -23,6 +25,7 @@ public class Cliente {
 	private LocalDate dataNascimento;
 	private char sexo;
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnoreProperties("cliente")
 	private List<Telefone> telefones;
 	@Embedded
 	private Endereco endereco;
@@ -32,6 +35,12 @@ public class Cliente {
 		this.telefones.add(telefone);
 	}
 	
+	@Override
+	public String toString() {
+		return "Cliente [id=" + id + ", nome=" + nome + ", cpf=" + cpf + ", email=" + email + ", dataNascimento="
+				+ dataNascimento + ", sexo=" + sexo + ", telefones=" + telefones + ", endereco=" + endereco + "]";
+	}
+
 	public Integer getId() {
 		return id;
 	}
