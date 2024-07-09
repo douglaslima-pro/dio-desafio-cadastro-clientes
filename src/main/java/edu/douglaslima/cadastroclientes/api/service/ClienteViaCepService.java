@@ -57,21 +57,19 @@ public class ClienteViaCepService implements ClienteService {
 	 * @param cep CEP (Código de Endereçamento Postal)
 	 * @throws CepNaoEncontradoException indica que a API ViaCep não encontrou dados para o CEP informado
 	 */
-	public void inserir(Cliente cliente, String cep) throws CepNaoEncontradoException {
+	public void inserir(Cliente cliente, String cep) {
+		if (!cliente.getTelefones().isEmpty()) {
+			List<Telefone> telefones = cliente.getTelefones();
+			telefones.stream()
+				.map(telefone -> {
+					telefone.setCliente(cliente);
+					return telefone;
+				})
+				.toList();
+			cliente.setTelefones(telefones);
+		}
 		Optional<Cep> cepEncontrado = this.viaCepService.pesquisarCep(cep);
-		if (cepEncontrado.isEmpty()) {
-			throw new CepNaoEncontradoException("Não foram encontrados dados para o CEP informado %s!", cep);
-		} else {
-			if (!cliente.getTelefones().isEmpty()) {
-				List<Telefone> telefones = cliente.getTelefones();
-				telefones.stream()
-					.map(telefone -> {
-						telefone.setCliente(cliente);
-						return telefone;
-					})
-					.toList();
-				cliente.setTelefones(telefones);
-			}
+		if (!cepEncontrado.isEmpty()) {
 			Endereco endereco = new Endereco();
 			endereco.setCep(cepEncontrado.get().cep());
 			endereco.setEstado(cepEncontrado.get().uf());
@@ -94,7 +92,7 @@ public class ClienteViaCepService implements ClienteService {
 	public Cliente buscarPorCpf(String cpf) throws ClienteNaoEncontradoException {
 		Optional<Cliente> clienteEncontrado = this.clienteRepository.findByCpf(cpf);
 		if (clienteEncontrado.isEmpty()) {
-			throw new ClienteNaoEncontradoException(String.format("Nenhum cliente foi encontrado com o CPF %s!", cpf));
+			throw new ClienteNaoEncontradoException(String.format("Nenhum cliente foi encontrado com o CPF '%s'!", cpf));
 		}
 		return clienteEncontrado.get();
 	}

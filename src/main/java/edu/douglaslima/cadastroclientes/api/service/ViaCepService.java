@@ -2,10 +2,12 @@ package edu.douglaslima.cadastroclientes.api.service;
 
 import java.util.Optional;
 
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import edu.douglaslima.cadastroclientes.api.exception.CepNaoEncontradoException;
 import edu.douglaslima.cadastroclientes.api.model.Cep;
 
 @Service
@@ -30,6 +32,11 @@ public class ViaCepService {
 				.uri("/{cep}/json", cep)
 				.accept(MediaType.APPLICATION_JSON)
 				.retrieve()
+				.onStatus(
+						httpStatusCode -> httpStatusCode.is4xxClientError(),
+						(request, response) -> {
+							throw new CepNaoEncontradoException("Não foram encontrados dados para o CEP informado '%s'!", cep);
+						})
 				.body(Cep.class);
 		return Optional.ofNullable(cepEncontrado);
 	}
