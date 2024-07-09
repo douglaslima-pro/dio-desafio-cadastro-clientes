@@ -87,7 +87,8 @@ public class ClienteViaCepService implements ClienteService {
 	/**
 	 * Pesquisa um cliente através do CPF.
 	 * @param cpf CPF (Cadastro de Pessoa Física)
-	 * @return um {@code Optional} contendo os dados do cliente encontrado
+	 * @return um objeto do tipo {@code Cliente}
+	 * @throws ClienteNaoEncontradoException indica que nenhum cliente foi encontrado com o {@code CPF} informado
 	 */
 	@Override
 	public Cliente buscarPorCpf(String cpf) throws ClienteNaoEncontradoException {
@@ -110,6 +111,7 @@ public class ClienteViaCepService implements ClienteService {
 	/**
 	 * Exclui um cliente do sistema com base no argumento id.
 	 * @param id id do cliente
+	 * @throws ClienteNaoEncontradoException indica que nenhum cliente foi encontrado com o {@code id} informado
 	 */
 	@Override
 	public void deletar(Integer id) throws ClienteNaoEncontradoException {
@@ -120,7 +122,7 @@ public class ClienteViaCepService implements ClienteService {
 	}
 	
 	/**
-	 * Retorna {@code true} se um cliente com {@code id} do argumento existir.
+	 * Retorna {@code true} se existir um cliente com o {@code id} informado.
 	 * @param id id do cliente
 	 * @return {@code true} se o cliente existir, caso contrário retorna {@code false}
 	 */

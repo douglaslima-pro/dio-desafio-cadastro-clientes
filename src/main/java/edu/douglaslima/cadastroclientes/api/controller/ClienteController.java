@@ -34,24 +34,16 @@ public class ClienteController {
 
 	@PostMapping("/cadastro/{cep}")
 	public ResponseEntity<String> inserir(@RequestBody Cliente cliente, @PathVariable("cep") String cep) {
-		try {
-			this.clienteViaCepService.inserir(cliente, cep);
-			return ResponseEntity.ok("Cliente cadastrado com sucesso!");
-		} catch (CepNaoEncontradoException e) {
-			throw new CepNaoEncontradoException(e.getMessage());
-		}
+		this.clienteViaCepService.inserir(cliente, cep);
+		return ResponseEntity.ok("Cliente cadastrado com sucesso!");
 	}
 
 	@GetMapping("/pesquisa/{cpf}")
 	public ResponseEntity<Cliente> buscarPorCpf(@PathVariable("cpf") String cpf) {
-		try {
-			Cliente cliente = this.clienteViaCepService.buscarPorCpf(cpf);
-			return ResponseEntity.ok(cliente);
-		} catch(ClienteNaoEncontradoException e) {
-			throw new ClienteNaoEncontradoException(e.getMessage());
-		}
+		Cliente cliente = this.clienteViaCepService.buscarPorCpf(cpf);
+		return ResponseEntity.ok(cliente);
 	}
-	
+
 	@GetMapping("/pesquisa")
 	public ResponseEntity<List<Cliente>> buscarTodos() {
 		List<Cliente> clientes = this.clienteViaCepService.buscarTodos();
@@ -60,12 +52,8 @@ public class ClienteController {
 
 	@DeleteMapping("/exclusao/{id}")
 	public ResponseEntity<String> deletar(@PathVariable("id") Integer id) {
-		try {
-			this.clienteViaCepService.deletar(id);
-			return ResponseEntity.ok(String.format("Cliente de ID %d excluído com sucesso!", id));
-		} catch(ClienteNaoEncontradoException e) {
-			throw new ClienteNaoEncontradoException(e.getMessage());
-		}
+		this.clienteViaCepService.deletar(id);
+		return ResponseEntity.ok(String.format("Cliente de ID %d excluído com sucesso!", id));
 	}
 
 }
