@@ -8,6 +8,8 @@ public interface ClienteService {
 	
 	void inserir(Cliente cliente);
 	
+	void atualizar(Cliente cliente);
+	
 	Cliente buscarPorCpf(String cpf);
 	
 	List<Cliente> buscarTodos();

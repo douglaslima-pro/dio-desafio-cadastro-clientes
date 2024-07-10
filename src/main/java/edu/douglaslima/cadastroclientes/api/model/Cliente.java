@@ -3,6 +3,8 @@ package edu.douglaslima.cadastroclientes.api.model;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.hibernate.collection.spi.PersistentList;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.*;
@@ -29,12 +31,15 @@ public class Cliente {
 	private List<Telefone> telefones;
 	@Embedded
 	private Endereco endereco;
-	
+
 	public void adicionarTelefone(Telefone telefone) {
-		telefone.setCliente(this);
-		this.telefones.add(telefone);
+		telefones.add(telefone);
 	}
-	
+
+	public void removerTelefone(Telefone telefone) {
+		telefones.remove(telefone);
+	}
+
 	@Override
 	public String toString() {
 		return "Cliente [id=" + id + ", nome=" + nome + ", cpf=" + cpf + ", email=" + email + ", dataNascimento="
@@ -44,65 +49,72 @@ public class Cliente {
 	public Integer getId() {
 		return id;
 	}
-	
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
-	
+
 	public String getNome() {
 		return nome;
 	}
-	
+
 	public void setNome(String nome) {
 		this.nome = nome;
 	}
-	
+
 	public String getCpf() {
 		return cpf;
 	}
-	
+
 	public void setCpf(String cpf) {
 		this.cpf = cpf;
 	}
-	
+
 	public String getEmail() {
 		return email;
 	}
-	
+
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	
+
 	public LocalDate getDataNascimento() {
 		return dataNascimento;
 	}
-	
+
 	public void setDataNascimento(LocalDate dataNascimento) {
 		this.dataNascimento = dataNascimento;
 	}
-	
+
 	public char getSexo() {
 		return sexo;
 	}
-	
+
 	public void setSexo(char sexo) {
 		this.sexo = sexo;
 	}
-	
+
 	public List<Telefone> getTelefones() {
 		return telefones;
 	}
-	
+
 	public void setTelefones(List<Telefone> telefones) {
-		this.telefones = telefones;
+		if (this.telefones == null) {
+			this.telefones = telefones;
+		} else {
+			this.telefones.clear();
+			if (telefones != null) {
+				this.telefones.addAll(telefones);
+			}
+		}
 	}
-	
+
 	public Endereco getEndereco() {
 		return endereco;
 	}
-	
+
 	public void setEndereco(Endereco endereco) {
 		this.endereco = endereco;
 	}
-	
+
 }

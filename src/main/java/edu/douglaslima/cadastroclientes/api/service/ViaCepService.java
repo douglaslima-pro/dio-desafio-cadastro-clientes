@@ -16,7 +16,7 @@ public class ViaCepService {
 	private final RestClient restClient;
 	
 	public ViaCepService() {
-		this.restClient = RestClient.builder()
+		restClient = RestClient.builder()
 				.baseUrl("https://viacep.com.br/ws")
 				.build();
 	}
@@ -24,11 +24,11 @@ public class ViaCepService {
 	/**
 	 * Realiza uma solicitação HTTP GET na API ViaCep, passando como argumento um {@code cep}.
 	 * @param cep CEP (Código de Endereçamento Postal)
-	 * @return um {@code Optional} contendo os dados do CEP encontrado
+	 * @return um objeto do tipo {@code Cep} contendo os dados do CEP encontrado
 	 * @see <a href='https://viacep.com.br'>https://viacep.com.br</a>
 	 */
-	public Optional<Cep> pesquisarCep(String cep) {
-		Cep cepEncontrado = this.restClient.get()
+	public Cep pesquisarCep(String cep) {
+		return restClient.get()
 				.uri("/{cep}/json", cep)
 				.accept(MediaType.APPLICATION_JSON)
 				.retrieve()
@@ -38,7 +38,6 @@ public class ViaCepService {
 							throw new CepNaoEncontradoException("Não foram encontrados dados para o CEP informado '%s'!", cep);
 						})
 				.body(Cep.class);
-		return Optional.ofNullable(cepEncontrado);
 	}
 
 }

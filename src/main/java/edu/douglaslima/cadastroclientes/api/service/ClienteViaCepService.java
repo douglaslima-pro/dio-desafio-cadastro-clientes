@@ -1,12 +1,10 @@
 package edu.douglaslima.cadastroclientes.api.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import edu.douglaslima.cadastroclientes.api.exception.CepNaoEncontradoException;
 import edu.douglaslima.cadastroclientes.api.exception.ClienteNaoEncontradoException;
 import edu.douglaslima.cadastroclientes.api.model.Cep;
 import edu.douglaslima.cadastroclientes.api.model.Cliente;
@@ -26,7 +24,7 @@ public class ClienteViaCepService implements ClienteService {
 
 	@Autowired
 	private ClienteRepository clienteRepository;
-	
+
 	@Autowired
 	private TelefoneRepository telefoneRepository;
 
@@ -56,7 +54,6 @@ public class ClienteViaCepService implements ClienteService {
 	 * Realiza o cadastro de um novo cliente e preenche os dados de endereço de forma automática a partir do argumento {@code cep}.
 	 * @param cliente Objeto que representa uma entidade do tipo {@code Cliente} com todos os seus atributos.
 	 * @param cep CEP (Código de Endereçamento Postal)
-	 * @throws CepNaoEncontradoException indica que a API ViaCep não encontrou dados para o CEP informado
 	 */
 	public void inserir(Cliente cliente, String cep) {
 		if (cliente.getTelefones() != null && !cliente.getTelefones().isEmpty()) {
@@ -69,18 +66,81 @@ public class ClienteViaCepService implements ClienteService {
 				.toList();
 			cliente.setTelefones(telefones);
 		}
-		Optional<Cep> cepEncontrado = viaCepService.pesquisarCep(cep);
-		if (!cepEncontrado.isEmpty()) {
-			Endereco endereco = new Endereco();
-			endereco.setCep(cepEncontrado.get().cep());
-			endereco.setEstado(cepEncontrado.get().uf());
-			endereco.setCidade(cepEncontrado.get().localidade());
-			endereco.setBairro(cepEncontrado.get().bairro());
-			endereco.setLogradouro(cepEncontrado.get().logradouro());
-			endereco.setComplemento(cepEncontrado.get().complemento());
-			cliente.setEndereco(endereco);
-		}
+		Cep cepEncontrado = viaCepService.pesquisarCep(cep);
+		Endereco endereco = new Endereco();
+		endereco.setCep(cepEncontrado.cep());
+		endereco.setEstado(cepEncontrado.uf());
+		endereco.setCidade(cepEncontrado.localidade());
+		endereco.setBairro(cepEncontrado.bairro());
+		endereco.setLogradouro(cepEncontrado.logradouro());
+		endereco.setComplemento(cepEncontrado.complemento());
+		cliente.setEndereco(endereco);
 		clienteRepository.save(cliente);
+	}
+	
+	/**
+	 * Atualiza os dados do cliente.
+	 * @param cliente Objeto que representa uma entidade do tipo {@code Cliente} com todos os seus atributos.
+	 * @throws ClienteNaoEncontradoException indica que nenhum cliente foi encontrado com os dados informados
+	 */
+	@Override
+	public void atualizar(Cliente cliente) throws ClienteNaoEncontradoException {
+		List<Telefone> telefones;
+		if (cliente.getTelefones() == null) {
+			telefones = telefoneRepository.findByCliente(cliente);
+			cliente.setTelefones(telefones);
+		} else {
+			telefones = cliente.getTelefones();
+			telefones = telefones.stream()
+					.map(telefone -> {
+						telefone.setCliente(cliente);
+						return telefone;
+						})
+					.toList();
+			cliente.setTelefones(telefones);
+		}
+		if (existePorId(cliente.getId())) {
+			clienteRepository.save(cliente);
+		} else {
+			throw new ClienteNaoEncontradoException("Nenhum cliente foi encontrado com os dados informados!");
+		}
+	}
+	
+	/**
+	 * Atualiza os dados do cliente e preenche os dados de endereço de forma automática a partir do argumento {@code cep}.
+	 * @param cliente Objeto que representa uma entidade do tipo {@code Cliente} com todos os seus atributos.
+	 * @param cep CEP (Código de Endereçamento Postal)
+	 * @throws ClienteNaoEncontradoException indica que nenhum cliente foi encontrado com os dados informados
+	 */
+	public void atualizar(Cliente cliente, String cep) throws ClienteNaoEncontradoException {
+		List<Telefone> telefones;
+		if (cliente.getTelefones() == null) {
+			telefones = telefoneRepository.findByCliente(cliente);
+			cliente.setTelefones(telefones);
+		} else {
+			telefones = cliente.getTelefones();
+			telefones = telefones.stream()
+					.map(telefone -> {
+						telefone.setCliente(cliente);
+						return telefone;
+						})
+					.toList();
+			cliente.setTelefones(telefones);
+		}
+		if (existePorId(cliente.getId())) {
+			Cep cepEncontrado = viaCepService.pesquisarCep(cep);
+			Endereco endereco = new Endereco();
+			endereco.setCep(cepEncontrado.cep());
+			endereco.setEstado(cepEncontrado.uf());
+			endereco.setCidade(cepEncontrado.localidade());
+			endereco.setBairro(cepEncontrado.bairro());
+			endereco.setLogradouro(cepEncontrado.logradouro());
+			endereco.setComplemento(cepEncontrado.complemento());
+			cliente.setEndereco(endereco);
+			clienteRepository.save(cliente);
+		} else {
+			throw new ClienteNaoEncontradoException("Nenhum cliente foi encontrado com os dados informados!");
+		}
 	}
 	
 	/**
@@ -91,11 +151,10 @@ public class ClienteViaCepService implements ClienteService {
 	 */
 	@Override
 	public Cliente buscarPorCpf(String cpf) throws ClienteNaoEncontradoException {
-		Cliente cliente = clienteRepository.findByCpf(cpf)
+		return clienteRepository.findByCpf(cpf)
 				.orElseThrow(() -> {
 					return new ClienteNaoEncontradoException(String.format("Nenhum cliente foi encontrado com o CPF '%s'!", cpf));
 					});
-		return cliente;
 	}
 	
 	/**
