@@ -6,8 +6,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.google.gson.Gson;
-
 import edu.douglaslima.cadastroclientes.api.exception.CepNaoEncontradoException;
 import edu.douglaslima.cadastroclientes.api.exception.ClienteNaoEncontradoException;
 import edu.douglaslima.cadastroclientes.api.model.Cep;
@@ -15,6 +13,7 @@ import edu.douglaslima.cadastroclientes.api.model.Cliente;
 import edu.douglaslima.cadastroclientes.api.model.Endereco;
 import edu.douglaslima.cadastroclientes.api.model.Telefone;
 import edu.douglaslima.cadastroclientes.api.repository.ClienteRepository;
+import edu.douglaslima.cadastroclientes.api.repository.TelefoneRepository;
 
 /**
  * Classe do tipo {@code Service} que engloba os principais métodos referentes à entidade {@code Cliente}.
@@ -25,9 +24,11 @@ import edu.douglaslima.cadastroclientes.api.repository.ClienteRepository;
 @Service
 public class ClienteViaCepService implements ClienteService {
 
-
 	@Autowired
 	private ClienteRepository clienteRepository;
+	
+	@Autowired
+	private TelefoneRepository telefoneRepository;
 
 	@Autowired
 	private ViaCepService viaCepService;
@@ -38,7 +39,7 @@ public class ClienteViaCepService implements ClienteService {
 	 */
 	@Override
 	public void inserir(Cliente cliente) {
-		if (!cliente.getTelefones().isEmpty()) {
+		if (cliente.getTelefones() != null && !cliente.getTelefones().isEmpty()) {
 			List<Telefone> telefones = cliente.getTelefones();
 			telefones.stream()
 				.map(telefone -> {
@@ -48,7 +49,7 @@ public class ClienteViaCepService implements ClienteService {
 				.toList();
 			cliente.setTelefones(telefones);
 		}
-		this.clienteRepository.save(cliente);
+		clienteRepository.save(cliente);
 	}
 	
 	/**
@@ -58,7 +59,7 @@ public class ClienteViaCepService implements ClienteService {
 	 * @throws CepNaoEncontradoException indica que a API ViaCep não encontrou dados para o CEP informado
 	 */
 	public void inserir(Cliente cliente, String cep) {
-		if (!cliente.getTelefones().isEmpty()) {
+		if (cliente.getTelefones() != null && !cliente.getTelefones().isEmpty()) {
 			List<Telefone> telefones = cliente.getTelefones();
 			telefones.stream()
 				.map(telefone -> {
@@ -68,7 +69,7 @@ public class ClienteViaCepService implements ClienteService {
 				.toList();
 			cliente.setTelefones(telefones);
 		}
-		Optional<Cep> cepEncontrado = this.viaCepService.pesquisarCep(cep);
+		Optional<Cep> cepEncontrado = viaCepService.pesquisarCep(cep);
 		if (!cepEncontrado.isEmpty()) {
 			Endereco endereco = new Endereco();
 			endereco.setCep(cepEncontrado.get().cep());
@@ -79,7 +80,7 @@ public class ClienteViaCepService implements ClienteService {
 			endereco.setComplemento(cepEncontrado.get().complemento());
 			cliente.setEndereco(endereco);
 		}
-		this.clienteRepository.save(cliente);
+		clienteRepository.save(cliente);
 	}
 	
 	/**
@@ -90,11 +91,11 @@ public class ClienteViaCepService implements ClienteService {
 	 */
 	@Override
 	public Cliente buscarPorCpf(String cpf) throws ClienteNaoEncontradoException {
-		Optional<Cliente> clienteEncontrado = this.clienteRepository.findByCpf(cpf);
-		if (clienteEncontrado.isEmpty()) {
-			throw new ClienteNaoEncontradoException(String.format("Nenhum cliente foi encontrado com o CPF '%s'!", cpf));
-		}
-		return clienteEncontrado.get();
+		Cliente cliente = clienteRepository.findByCpf(cpf)
+				.orElseThrow(() -> {
+					return new ClienteNaoEncontradoException(String.format("Nenhum cliente foi encontrado com o CPF '%s'!", cpf));
+					});
+		return cliente;
 	}
 	
 	/**
@@ -103,7 +104,7 @@ public class ClienteViaCepService implements ClienteService {
 	 */
 	@Override
 	public List<Cliente> buscarTodos() {
-		return this.clienteRepository.findAll();
+		return clienteRepository.findAll();
 	}
 	
 	/**
@@ -113,10 +114,10 @@ public class ClienteViaCepService implements ClienteService {
 	 */
 	@Override
 	public void deletar(Integer id) throws ClienteNaoEncontradoException {
-		if (!this.existePorId(id)) {
+		if (!existePorId(id)) {
 			throw new ClienteNaoEncontradoException("Nenhum cliente foi encontrado com o ID %d!", id);
 		}
-		this.clienteRepository.deleteById(id);
+		clienteRepository.deleteById(id);
 	}
 	
 	/**
@@ -126,7 +127,7 @@ public class ClienteViaCepService implements ClienteService {
 	 */
 	@Override
 	public boolean existePorId(Integer id) {
-		return this.clienteRepository.existsById(id);
+		return clienteRepository.existsById(id);
 	}
 	
 }

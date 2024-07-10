@@ -28,32 +28,36 @@ public class ClienteController {
 
 	@PostMapping("/cadastro")
 	public ResponseEntity<String> inserir(@RequestBody Cliente cliente) {
-		this.clienteViaCepService.inserir(cliente);
+		clienteViaCepService.inserir(cliente);
 		return ResponseEntity.ok("Cliente cadastrado com sucesso!");
 	}
 
 	@PostMapping("/cadastro/{cep}")
 	public ResponseEntity<String> inserir(@RequestBody Cliente cliente, @PathVariable("cep") String cep) {
-		this.clienteViaCepService.inserir(cliente, cep);
+		clienteViaCepService.inserir(cliente, cep);
 		return ResponseEntity.ok("Cliente cadastrado com sucesso!");
 	}
 
 	@GetMapping("/pesquisa/{cpf}")
 	public ResponseEntity<Cliente> buscarPorCpf(@PathVariable("cpf") String cpf) {
-		Cliente cliente = this.clienteViaCepService.buscarPorCpf(cpf);
+		Cliente cliente = clienteViaCepService.buscarPorCpf(cpf);
 		return ResponseEntity.ok(cliente);
 	}
 
 	@GetMapping("/pesquisa")
-	public ResponseEntity<List<Cliente>> buscarTodos() {
-		List<Cliente> clientes = this.clienteViaCepService.buscarTodos();
-		return ResponseEntity.ok(clientes);
+	public ResponseEntity<Object> buscarTodos() {
+		List<Cliente> clientes = clienteViaCepService.buscarTodos();
+		if (!clientes.isEmpty()) {
+			return ResponseEntity.ok(clientes);
+		} else {
+			return new ResponseEntity<Object>("Nenhum cliente cadastrado no sistema!", HttpStatus.NO_CONTENT);
+		}
 	}
 
 	@DeleteMapping("/exclusao/{id}")
 	public ResponseEntity<String> deletar(@PathVariable("id") Integer id) {
-		this.clienteViaCepService.deletar(id);
-		return ResponseEntity.ok(String.format("Cliente de ID %d excluído com sucesso!", id));
+		clienteViaCepService.deletar(id);
+		return new ResponseEntity<String>(String.format("Cliente de ID %d excluído com sucesso!", id), HttpStatus.NO_CONTENT);
 	}
 
 }

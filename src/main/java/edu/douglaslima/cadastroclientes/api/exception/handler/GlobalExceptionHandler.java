@@ -23,13 +23,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(ClienteNaoEncontradoException.class)
 	public ResponseEntity<Object> handleClienteNaoEncontradoException(ClienteNaoEncontradoException exception, WebRequest request) {
 		ResponseError responseBody = new ResponseError(HttpStatus.NOT_FOUND.value(), "Cliente não encontrado", exception.getMessage());
-		return super.handleExceptionInternal(exception, responseBody, this.header(), HttpStatus.NOT_FOUND, request);
+		return handleExceptionInternal(exception, responseBody, this.header(), HttpStatus.NOT_FOUND, request);
 	}
 	
 	@ExceptionHandler(CepNaoEncontradoException.class)
 	public ResponseEntity<Object> handleCepNaoEncontradoException(CepNaoEncontradoException exception, WebRequest request) {
 		ResponseError responseBody = new ResponseError(HttpStatus.NOT_FOUND.value(), "CEP não encontrado", exception.getMessage());
-		return super.handleExceptionInternal(exception, responseBody, this.header(), HttpStatus.NOT_FOUND, request);
+		return handleExceptionInternal(exception, responseBody, this.header(), HttpStatus.NOT_FOUND, request);
 	}
 	
 }
